@@ -121,7 +121,7 @@ impl GeneratorTab {
                     ui.label(egui::RichText::new("Dimensiones de la Matriz").strong());
                     ui.horizontal(|ui| {
                         ui.label("Filas (R):");
-                        let r_res = ui.add(DragValue::new(&mut self.rows).range(1..=100).speed(0.1));
+                        let r_res = ui.add(DragValue::new(&mut self.rows).range(1..=usize::MAX).speed(1.0));
                         if r_res.changed() && self.sync_square && self.mode == MatrixGenerationMode::DiagonallyDominant {
                             self.cols = self.rows;
                         }
@@ -129,7 +129,7 @@ impl GeneratorTab {
 
                     ui.horizontal(|ui| {
                         ui.label("Columnas (C):");
-                        let c_res = ui.add(DragValue::new(&mut self.cols).range(1..=100).speed(0.1));
+                        let c_res = ui.add(DragValue::new(&mut self.cols).range(1..=usize::MAX).speed(1.0));
                         if c_res.changed() && self.sync_square && self.mode == MatrixGenerationMode::DiagonallyDominant {
                             self.rows = self.cols;
                         }
@@ -339,6 +339,31 @@ impl GeneratorTab {
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_large_matrix_generation() {
+        let mut tab = GeneratorTab::default();
+        tab.rows = 150;
+        tab.cols = 150;
+        tab.mode = MatrixGenerationMode::DiagonallyDominant;
+
+        let mut mat = None;
+        let mut b = None;
+        tab.execute_generation(&mut mat, &mut b);
+
+        assert!(mat.is_some());
+        let m = mat.unwrap();
+        assert_eq!(m.rows, 150);
+        assert_eq!(m.columns, 150);
+        assert!(m.is_diagonally_dominant());
+        assert!(b.is_some());
+        assert_eq!(b.unwrap().rows, 150);
     }
 }
 

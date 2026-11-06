@@ -382,8 +382,9 @@ impl LinearSystemsTab {
                             ui.end_row();
 
                             let mut max_diff = BigDecimal::from(0);
+                            let display_vars = n_vars.min(100);
 
-                            for i in 0..n_vars {
+                            for i in 0..display_vars {
                                 ui.colored_label(COLOR_TEXT_MUTED, format!("x_{}", i));
 
                                 let gs_val = gs_matrix.and_then(|m| m.get(i, 0));
@@ -437,6 +438,15 @@ impl LinearSystemsTab {
                                     });
                                 }
 
+                                ui.end_row();
+                            }
+
+                            if n_vars > display_vars {
+                                ui.colored_label(COLOR_TEXT_MUTED, "...");
+                                ui.colored_label(
+                                    COLOR_TEXT_MUTED,
+                                    format!("... Mostrando primeras {} de {} incógnitas (usa 'Copiar Soluciones' para ver todo)", display_vars, n_vars),
+                                );
                                 ui.end_row();
                             }
                         });
